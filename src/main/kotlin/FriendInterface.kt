@@ -1,0 +1,3 @@
+interface FriendInterface {
+    fun addFriends()
+}
