@@ -1,3 +1,4 @@
 interface FriendInterface {
-    fun addFriends()
+    fun addFriends(user: User)
+    fun getListOfFriends() : MutableList<User>
 }

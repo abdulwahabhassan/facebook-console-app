@@ -1,5 +1,5 @@
 interface PostInterface {
-    fun readPost()
-    fun deletePost()
+    fun readPost(post: Post)
+    fun deletePost(post: Post)
 
 }

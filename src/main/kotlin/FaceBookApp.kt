@@ -18,7 +18,8 @@ class FaceBookApp {
             private set
 
         //map of user to account, user Ids serve as key, keep as private, visible only within this app
-        private val mapOfUserIdToAccount = mutableMapOf<Int, Account>()
+        var mapOfUserIdToAccount = mutableMapOf<Int, Account>()
+            private set
 
         //mutable list of banned accounts on the app
         private val bannedAccounts = mutableListOf<Int>()
@@ -26,16 +27,19 @@ class FaceBookApp {
         //mutable list of flagged posts on the app, identified by their postId
         private val flaggedPosts = mutableListOf<Int>()
 
-        //banned accounts is private and with this method admins can update it
-        fun addToListOfBannedAccounts(user: User) {
-           bannedAccounts.add(user.userId)
+
+        //method to generate user id
+        internal fun generateUserId(): Int {
+            //use the position of the new user on the list of users in the app as the new user's id
+            return users.lastIndex + 1
         }
 
-        fun addPostToFlaggedPosts(post: Post) {
-            flaggedPosts.add(post.postId)
+        //method to add user to app
+        internal fun addUserToApp(user: User) {
+            users.add(user)
         }
 
-        fun createUserAccount(user: User, admin: Boolean) {
+        internal fun createUserAccount(user: User, admin: Boolean) {
             //create user account type based on age qualification and admin status
             //select the appropriate account from the sealed class types
             //put user account in mapOfUserIdToAccount using the userID as key,
@@ -43,54 +47,89 @@ class FaceBookApp {
             if (user.age < 18) {
                 println("PG 18: Children can't create account")
             } else if (user.age > 18 && admin) {
-                mapOfUserIdToAccount[user.userId] = Account.Admin(user)
+                mapOfUserIdToAccount[user.userId] = Account.Admin(user, true)
             } else {
-                mapOfUserIdToAccount[user.userId] = Account.Adult(user)
+                mapOfUserIdToAccount[user.userId] = Account.Adult(user, true)
             }
+            //note that when accounts are created, they are logged in by default, hence true
+            //until user logs out
 
             when (mapOfUserIdToAccount[user.userId]) {
-                is Account.Admin -> println("Admin account created")
-                is Account.Adult -> println("Adult account created")
-                is Account.Child -> println("Child account created")
+                is Account.Admin -> println("Admin account created for ${user.name}, ${user.age}")
+                is Account.Adult -> println("Adult account created for ${user.name}, ${user.age}")
+                is Account.Child -> println("Child account created for ${user.name}, ${user.age}")
             }
         }
 
-        fun createChildUserAccount(user: User, guardian: User) {
-
+        internal fun createChildUserAccount(user: User, guardian: User) {
             //verify if guardian's account is an admin or adult account before allowing to create child account
+            //only admin and adult accounts can create child account
             if (mapOfUserIdToAccount[guardian.userId] is Account.Admin ||
                 mapOfUserIdToAccount[guardian.userId] is Account.Adult) {
-                mapOfUserIdToAccount[user.userId] = Account.Child(user)
+                mapOfUserIdToAccount[user.userId] = Account.Child(user, true)
+                //note that when accounts are created, they are logged in by default, hence true
+                //until user logs out
+
+                //automatically add guardian to child's account list of guardians
+                (mapOfUserIdToAccount[user.userId] as Account.Child).addGuardian(guardian)
+                println("Child account created for ${user.name}")
             }
         }
 
-        //method to generate user id
-        fun generateUserId(): Int {
-            //use the position of the new user on the list of users in the app as the new user's id
-            return users.lastIndex + 1
+        //banned accounts is private and with this method admins can update it
+        internal fun addToListOfBannedAccounts(user: User, account: Account) {
+            //verify first if action is coming from user with account type of admin
+            if (account is Account.Admin) {
+                bannedAccounts.add(user.userId)
+                println("Banned account for ${user.name}")
+            }
+        }
+
+        //method for flagging post
+        internal fun addPostToFlaggedPosts(post: Post, account: Account) {
+            if (account is Account.Admin) {
+                flaggedPosts.add(post.postId)
+                println("This post with title: ${post.title} has been flagged")
+            }
         }
 
         //method to generate post id
-        fun generatePostId(): Int {
+        internal fun generatePostId(): Int {
             //use the position of the new post on the list of posts in the app as the new post's id
+            println("Post id: ${posts.lastIndex + 1} generated")
             return posts.lastIndex + 1
         }
 
         //method to create post
-        fun createPost(post: Post) {
-            posts.add(post)
+        internal fun createPost(post: Post, account: Account) {
+            //verify if the account creating possible is of the allowed types: Admin and Adult only
+            if (account is Account.Admin || account is Account.Adult) {
+                posts.add(post)
+                println("Post (Post id: ${post.postId}, Post title: ${post.title}) added to home page")
+            }
         }
 
-        //method to add user to app
-        fun addUserToApp(user: User) {
-            users.add(user)
+        //method used by admin and adult for publishing child post
+        internal fun publishChildPost(post: Post, account: Account) {
+            //verify if account is of Adult or Admin type
+           if (account is Account.Adult || account is Account.Admin) {
+               posts.add(post)
+               println("Child post (Post id: ${post.postId}, Post title: ${post.title}) approved and published to " +
+                       "home page by ${account.holder.name}")
+           }
         }
 
-        //method to get user account
-        fun getUserAccount(user: User) : Account? {
-            //if user.userId exists in the map as a key, retrieve and return the value of the key
-            //which represents the account of user else return null
-            return if (mapOfUserIdToAccount.containsKey(user.userId)) mapOfUserIdToAccount[user.userId] else null
+        //method to access user account, must be accessed with a password
+        internal fun getUserAccount(user: User, passWord: Int) : Account? {
+            //if password matches and user.userId exists in the map as a key, retrieve and return the value of the key
+            //which represents the account of the user else return null
+            return if (passWord == user.getPassWord() && mapOfUserIdToAccount.containsKey(user.userId)) {
+                println("Pass-word is correct and access granted")
+                mapOfUserIdToAccount[user.userId]
+            } else {
+                println("Pass-word is in-correct or account does not exist, hence access denied")
+                null
+            }
         }
 
     }

@@ -4,7 +4,7 @@ data class User (
     var name: String,
     var age: Int,
     var admin: Boolean,
-    var passWord: Int)  {
+    private var passWord: Int)  {
 
     var userId by Delegates.notNull<Int>()
 
@@ -20,10 +20,15 @@ data class User (
         FaceBookApp.createUserAccount(this, admin)
     }
 
+    //method to get passWord, passWords are sensitive, hence should be private
+    fun getPassWord(): Int {
+        return passWord
+    }
+
     //to use this method to access user's account, password must be provided
     fun getAccount(passWord: Int) : Account? {
-        //if password match the user's password, retrieve the user's account else return null
-        return if (passWord == this.passWord) FaceBookApp.getUserAccount(this) else null
+        //retrieve user account from app's database, providing password
+        return FaceBookApp.getUserAccount(this, passWord)
 
     }
 
