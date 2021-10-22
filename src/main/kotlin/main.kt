@@ -7,27 +7,116 @@ fun main(args: Array<String>) {
 
     val facebookServiceImpl = FacebookServiceImpl()
 
-    fun showAccountDetails() {
-        println("Account details")
+    fun showAccountDetails(account: Account) {
+        println("ACCOUNT DETAILS")
+        println("""
+            Account Id: ${account.accountId}
+            Active: ${account.loggedIn}
+            Name: ${account.userName}
+            Age: ${account.userAge}
+            Number Of Friends: ${account.friends.size}
+            Password: ${account.passWord}
+            Type: ${account.type}
+        """.trimIndent())
     }
 
 
-    fun showFriends() {
-        println("Friends")
+    fun showFriends(account: Account) {
+        println("FRIENDS")
+        account.friends.forEach { println("${it.name}, ${it.age}") }
     }
 
 
-    fun showGuardians() {
-        println("Guardians")
+    fun showGuardians(account: Account.Child) {
+        println("GUARDIANS")
+        for (guardian in account.guardians) {
+            println("${guardian.userName}, ${guardian.userAge}")
+        }
     }
 
 
-    fun goToHomePage() {
-        println("Home page")
+    fun startAdminHomePageFlow() {
+        var input: String? = null
+
+        do {
+            if(input != null) {
+                println("Invalid input, try again..")
+            }
+            println("""
+                Press '1' to read posts
+                Press '2' to create a post
+                Press '3' to delete a post
+                Press '4' to add a friend
+                Press '5' to flag a post
+                Press '6' to ban account
+                Press '7' to log out
+        """.trimIndent())
+            input = readLine()
+        } while (input != "1" && input != "2" && input != "3"
+            && input != "4" && input != "5" && input != "6" && input != "7")
+
+
     }
 
 
-    fun launchChildAccountFlow() {
+    fun startAdultHomePageFlow() {
+
+        var input: String? = null
+
+        do {
+            if(input != null) {
+                println("Invalid input, try again..")
+            }
+            println("""
+                Press '1' to read posts
+                Press '2' to create a post
+                Press '3' to delete a post
+                Press '4' to add a friend
+                Press '5' to create child account
+                Press '6' to approve child post
+                Press '7' to log out
+        """.trimIndent())
+            input = readLine()
+        } while (input != "1" && input != "2" && input != "3"
+            && input != "4" && input != "5" && input != "6" && input != "7")
+
+    }
+
+
+    fun startChildHomePageFlow() {
+
+        var input: String? = null
+
+        do {
+            if(input != null) {
+                println("Invalid input, try again..")
+            }
+            println("""
+                Press '1' to read posts
+                Press '2' to create a post
+                Press '3' to delete a post
+                Press '4' to add a friend
+                Press '5' to add guardian
+                Press '6' to log out
+        """.trimIndent())
+            input = readLine()
+        } while (input != "1" && input != "2" && input != "3"
+            && input != "4" && input != "5" && input != "6")
+
+    }
+
+
+    fun goToHomePage(account: Account) {
+        println("HOME PAGE")
+        when(account) {
+            is Account.Admin -> startAdminHomePageFlow()
+            is Account.Adult -> startAdultHomePageFlow()
+            is Account.Child -> startChildHomePageFlow()
+        }
+    }
+
+
+    fun launchChildAccountFlow(account: Account.Child) {
 
         var input: String? = null
 
@@ -38,22 +127,23 @@ fun main(args: Array<String>) {
             println("""
                 Press '1' to see your account details
                 Press '2' to see your friends
-                press '3' to see your guardians
-                press '4' to go to home page
+                Press '3' to see your guardians
+                Press '4' to go to home page
             """.trimIndent())
             input = readLine()
         } while (input != "1" && input != "2" && input != "3" && input != "4")
 
         when(input) {
-            "1" -> showAccountDetails()
-            "2" -> showFriends()
-            "3" -> showGuardians()
-            "4" -> goToHomePage()
+            "1" -> showAccountDetails(account)
+            "2" -> showFriends(account)
+            "3" -> showGuardians(account)
+            "4" -> goToHomePage(account)
         }
+
     }
 
 
-    fun launchAdultAccountFlow() {
+    fun launchAdultAccountFlow(account: Account.Adult) {
 
         var input: String? = null
 
@@ -64,26 +154,21 @@ fun main(args: Array<String>) {
             println("""
                 Press '1' to see your account details
                 Press '2' to see your friends
-                press '3' to go to home page
+                Press '3' to go to home page
             """.trimIndent())
             input = readLine()
         } while (input != "1" && input != "2" && input != "3")
 
         when(input) {
-            "1" -> showAccountDetails()
-            "2" -> showFriends()
-            "3" -> goToHomePage()
+            "1" -> showAccountDetails(account)
+            "2" -> showFriends(account)
+            "3" -> goToHomePage(account)
         }
 
     }
 
 
-    fun goToAdminPage() {
-
-    }
-
-
-    fun launchAdminAccountFlow() {
+    fun launchAdminAccountFlow(account: Account.Admin) {
 
         var input: String? = null
 
@@ -94,17 +179,15 @@ fun main(args: Array<String>) {
             println("""
                 Press '1' to see your account details
                 Press '2' to see your friends
-                press '3' to go to home page
-                press '4' to go to Admin Page
+                Press '3' to go to home page
             """.trimIndent())
             input = readLine()
         } while (input != "1" && input != "2" && input != "3")
 
         when(input) {
-            "1" -> showAccountDetails()
-            "2" -> showFriends()
-            "3" -> goToHomePage()
-            "4" -> goToAdminPage()
+            "1" -> showAccountDetails(account)
+            "2" -> showFriends(account)
+            "3" -> goToHomePage(account)
         }
 
     }
@@ -139,13 +222,13 @@ fun main(args: Array<String>) {
         println("Successful login!, welcome ${account.userName}")
         when (account) {
             is Account.Child -> {
-                launchChildAccountFlow()
+                launchChildAccountFlow(account)
             }
             is Account.Adult -> {
-                launchAdultAccountFlow()
+                launchAdultAccountFlow(account)
             }
             is Account.Admin -> {
-                launchAdminAccountFlow()
+                launchAdminAccountFlow(account)
             }
         }
 
@@ -202,6 +285,7 @@ fun main(args: Array<String>) {
 
         println("Congrats!! You have successfully created an account\n")
         println("$account\n")
+
         println("Press '1' to login to your account, press '2' to quit:")
 
         input = readLine()
@@ -236,7 +320,5 @@ fun main(args: Array<String>) {
     }
 
     startAppFlow()
-
-
 
 }

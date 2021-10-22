@@ -4,9 +4,9 @@ import interfaces.AdultService
 import models.Post
 import models.User
 
-class AdultServiceImpl (
+open class AdultServiceImpl (
     private val faceBookServiceImpl: FacebookServiceImpl = FacebookServiceImpl()
-        ) : AdultService {
+        ) : AdultService, UserServiceImpl() {
 
     override fun createPost(post: Post, accountId: String) {
             faceBookServiceImpl.addPostToHomePage(post, accountId)

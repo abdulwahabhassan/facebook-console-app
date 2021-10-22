@@ -7,5 +7,4 @@ interface ChildService {
 
     fun addGuardian(guardian: Account, childAccountId: String)
 
-    fun createPost(post: Post, accountId: String)
 }

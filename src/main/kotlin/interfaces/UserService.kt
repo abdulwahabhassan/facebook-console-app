@@ -9,8 +9,6 @@ interface UserService  {
 
     fun deletePost(post: Post, accountId: String)
 
-    fun logIn(accountId: String, password: String)
-
     fun logOut(accountId: String)
 
     fun readPost(post: Post): String

@@ -6,7 +6,7 @@ import models.Post
 
 class AdminServiceImpl (
     private val facebookServiceImpl: FacebookServiceImpl = FacebookServiceImpl()
-        ) : AdminService {
+        ) : AdminService, AdultServiceImpl() {
 
     override fun flagPost(post: Post) {
         facebookServiceImpl.flagPost(post)

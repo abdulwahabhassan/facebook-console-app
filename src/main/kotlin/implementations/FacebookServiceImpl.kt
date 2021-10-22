@@ -49,7 +49,6 @@ class FacebookServiceImpl : FaceBookService {
         } else {
             null
         }
-
     }
 
     override fun generateUserId(): Int {
@@ -62,6 +61,10 @@ class FacebookServiceImpl : FaceBookService {
 
     override fun addGuardianToChildAccount(guardian: Account, childAccountId: String) {
             (FaceBookApp.mapOfAccounts[childAccountId] as Account.Child).guardians.add(guardian)
+    }
+
+    override fun approveChildPost(post: Post, accountId: String) {
+
     }
 
     fun banAccount(account: Account) {

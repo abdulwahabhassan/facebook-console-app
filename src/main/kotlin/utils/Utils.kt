@@ -25,7 +25,6 @@ object Utils {
                 null
             }
         }
-
     }
 
     fun validateEmptyField(entry: String?) : Boolean {

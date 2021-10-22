@@ -30,4 +30,6 @@ interface FaceBookService {
 
     fun addGuardianToChildAccount(guardian: Account, childAccountId: String)
 
+    fun approveChildPost(post: Post, accountId: String)
+
 }

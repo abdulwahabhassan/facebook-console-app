@@ -4,9 +4,9 @@ import interfaces.UserService
 import models.Post
 import models.User
 
-class UserServiceImpl(
+abstract class UserServiceImpl (
     private val faceBookServiceImpl: FacebookServiceImpl = FacebookServiceImpl()
-) : UserService {
+        ) : UserService {
 
     override fun addFriend(friend: User, accountId: String) {
         faceBookServiceImpl.addFriendToUserAccount(friend, accountId)
@@ -14,10 +14,6 @@ class UserServiceImpl(
 
     override fun deletePost(post: Post, accountId: String) {
         faceBookServiceImpl.deletePostFromHomePage(post, accountId)
-    }
-
-    override fun logIn(accountId: String, password: String) {
-        faceBookServiceImpl.logUserIn(accountId, password)
     }
 
     override fun logOut(accountId: String) {
@@ -28,5 +24,7 @@ class UserServiceImpl(
         return "Reading mode..\nTitle -> ${post.title}" +
                 "\nBody-> ${post.body}"
     }
+
+    abstract fun createPost(post: Post, accountId: String)
 
 }
